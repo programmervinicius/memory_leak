@@ -1,4 +1,6 @@
-﻿namespace MemoryLeak
+﻿using System.Threading;
+
+namespace MemoryLeak
 {
     using System;
     using System.Diagnostics;
@@ -22,8 +24,8 @@
             var apnsPort = 2195;
             var apnsFeedBackHost = "feedback.push.apple.com";
             var apnsFeedBackPort = 2196;
-            var certificateFilePath = "";
-            var certificatePassword = "";
+            var certificateFilePath = "cert.p12";
+            var certificatePassword = "pass";
 
             var certificate = new X509Certificate2(
                 File.ReadAllBytes(certificateFilePath),
@@ -38,9 +40,16 @@
                     apnsFeedBackPort));
             applePushNotificationService.StartServiceProvider();
 
-            while (true)
+            var deviceToken = "ca1e9059ac913d0eecbb2484cfbe2d42943b4e031899901f40bf878d940ef0fd";
+            var notification = new ApnsNotification(deviceToken, "");
+            for(int i=0;i<100;i++)
             {
+                Thread.Sleep(100);
+                
+                applePushNotificationService.QueueApnsNotification(notification);
             }
+
+            Console.ReadKey();
         }
 
         private static void EnableConsoleLogging()
